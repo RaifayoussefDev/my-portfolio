@@ -7,6 +7,7 @@ import About from './components/About'
 import FeaturedProject from './components/FeaturedProject'
 import Experience from './components/Experience'
 import Skills from './components/Skills'
+import GitHubContributions from './components/GitHubContributions'
 import Education from './components/Education'
 import Contact from './components/Contact'
 import Preloader from './components/Preloader'
@@ -34,6 +35,9 @@ export default function App() {
         </RevealWipe>
         <RevealWipe>
           <Skills />
+        </RevealWipe>
+        <RevealWipe>
+          <GitHubContributions />
         </RevealWipe>
         <RevealWipe>
           <Education />
