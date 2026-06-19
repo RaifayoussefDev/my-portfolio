@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { motion, useMotionValue, useSpring, useScroll, useTransform } from 'framer-motion'
-import { Mail, Phone, MapPin, Linkedin, ArrowDown } from 'lucide-react'
+import { Mail, Phone, MapPin, Linkedin, Github, ArrowDown } from 'lucide-react'
 import { profile } from '../data/content'
 
 const NAME = profile.name
@@ -206,6 +206,9 @@ export default function Hero() {
           </span>
           <a href={profile.linkedinUrl} target="_blank" rel="noreferrer" data-cursor-hover className="flex items-center gap-2 transition-colors hover:text-circuit">
             <Linkedin size={14} /> {profile.linkedin}
+          </a>
+          <a href={profile.githubUrl} target="_blank" rel="noreferrer" data-cursor-hover className="flex items-center gap-2 transition-colors hover:text-circuit">
+            <Github size={14} /> GitHub
           </a>
         </motion.div>
       </motion.div>

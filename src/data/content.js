@@ -6,7 +6,8 @@ export const profile = {
   email: 'yucefr@gmail.com',
   phone: '+212 6 88 80 82 38',
   linkedin: 'Youssef Raifa',
-  linkedinUrl: 'https://linkedin.com',
+  linkedinUrl: 'https://www.linkedin.com/in/youssef-raifa/',
+  githubUrl: 'https://github.com/RaifayoussefDev',
 }
 
 export const about = {
