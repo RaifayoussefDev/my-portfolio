@@ -56,8 +56,8 @@ export const skills = {
 
 export const languages = [
   { name: 'Arabe', level: 'Langue maternelle', value: 100 },
-  { name: 'Français', level: 'Courant', value: 90 },
-  { name: 'Anglais', level: 'Intermédiaire', value: 60 },
+  { name: 'Français', level: 'Courant', value: 100 },
+  { name: 'Anglais', level: 'Intermédiaire', value: 80 },
 ]
 
 // Featured personal/freelance project — DabApp
