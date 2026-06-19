@@ -2,7 +2,7 @@ export const profile = {
   name: 'Youssef Raifa',
   role: 'Ingénieur Logiciel — Full Stack',
   tagline: "4 ans d'expérience à concevoir et livrer des applications web et mobiles robustes, de l'architecture jusqu'à la mise en production.",
-  location: 'Derb Ghallef, Casablanca, Maroc',
+  location: 'Casablanca, Maroc',
   email: 'yucefr@gmail.com',
   phone: '+212 6 88 80 82 38',
   linkedin: 'Youssef Raifa',
