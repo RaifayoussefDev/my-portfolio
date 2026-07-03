@@ -19,7 +19,9 @@ const FREE_MODELS = [
   'meta-llama/llama-3.3-70b-instruct:free',
   'meta-llama/llama-3.2-3b-instruct:free',
   'google/gemma-4-31b-it:free',
+  'google/gemma-4-26b-a4b-it:free',
   'qwen/qwen3-coder:free',
+  'nousresearch/hermes-3-llama-3.1-405b:free',
 ]
 
 async function tryModel(apiKey, model, message) {
@@ -42,9 +44,9 @@ async function tryModel(apiKey, model, message) {
   })
 
   const data = await response.json()
-  if (!response.ok) throw new Error(data.error?.message || 'Erreur API')
+  if (!response.ok) throw new Error(data.error?.message || 'error')
   const reply = data.choices?.[0]?.message?.content
-  if (!reply) throw new Error('Réponse vide')
+  if (!reply) throw new Error('empty')
   return reply
 }
 
@@ -57,14 +59,10 @@ export default async function handler(req, res) {
   const apiKey = process.env.OPENROUTER_API_KEY
   if (!apiKey) return res.status(500).json({ error: 'Clé API manquante' })
 
-  for (const model of FREE_MODELS) {
-    try {
-      const reply = await tryModel(apiKey, model, message)
-      return res.json({ reply })
-    } catch {
-      continue
-    }
+  try {
+    const reply = await Promise.any(FREE_MODELS.map(model => tryModel(apiKey, model, message)))
+    return res.json({ reply })
+  } catch {
+    res.status(503).json({ error: 'Service temporairement indisponible, réessayez dans quelques instants.' })
   }
-
-  res.status(503).json({ error: 'Service temporairement indisponible, réessayez dans quelques instants.' })
 }
