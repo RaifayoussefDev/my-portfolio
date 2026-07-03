@@ -12,6 +12,7 @@ import Education from './components/Education'
 import Contact from './components/Contact'
 import Preloader from './components/Preloader'
 import RevealWipe from './components/RevealWipe'
+import AiChat from './components/AiChat'
 
 export default function App() {
   const [booted, setBooted] = useState(false)
@@ -22,6 +23,7 @@ export default function App() {
       <CursorGlow />
       {!booted && <Preloader onDone={() => setBooted(true)} />}
       <Navbar />
+      <AiChat />
       <main>
         <Hero />
         <RevealWipe>
