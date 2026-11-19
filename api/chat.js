@@ -13,7 +13,8 @@ Informations sur Youssef Raifa :
 - Portfolio : https://raifa-youssef.vercel.app
 - Disponible pour missions freelance et CDI
 
-Ne réponds qu'aux questions en rapport avec Youssef, ses compétences, son expérience ou la prise de contact. Pour tout autre sujet, redirige poliment vers l'essentiel.`
+Ne réponds qu'aux questions en rapport avec Youssef, ses compétences, son expérience ou la prise de contact. Pour tout autre sujet, redirige poliment vers l'essentiel.
+Réponds en texte brut, sans Markdown (pas de **, #, ni tableaux), en 3 à 5 phrases maximum ou une courte liste avec des tirets.`
 
 // OpenRouter retire régulièrement des modèles gratuits.
 // `openrouter/free` route automatiquement vers un modèle gratuit disponible ;
@@ -46,7 +47,10 @@ async function tryModel(apiKey, model, message) {
 
   const data = await response.json()
   if (!response.ok) throw new Error(`${model}: ${data.error?.message || response.status}`)
-  const reply = data.choices?.[0]?.message?.content?.replace(/<think>[\s\S]*?<\/think>/g, '').trim()
+  const reply = data.choices?.[0]?.message?.content?.replace(/<think>[\s\S]*?<\/think>/g, '')
+    .replace(/\*\*(.+?)\*\*/g, '$1')
+    .replace(/^#{1,6}\s+/gm, '')
+    .trim()
   if (!reply) throw new Error(`${model}: empty reply`)
   return reply
 }

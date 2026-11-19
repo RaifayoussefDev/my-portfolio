@@ -84,7 +84,7 @@ export default function AiChat() {
               {messages.map((m, i) => (
                 <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                   <div
-                    className={`max-w-[80%] rounded-xl px-3 py-2 font-body text-sm leading-relaxed ${
+                    className={`max-w-[80%] whitespace-pre-line rounded-xl px-3 py-2 font-body text-sm leading-relaxed ${
                       m.role === 'user'
                         ? 'bg-circuit text-ink-950'
                         : 'border border-ink-700 bg-ink-800 text-offwhite'
