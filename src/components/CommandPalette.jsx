@@ -8,6 +8,7 @@ import { profile } from '../data/content'
 const sections = [
   { id: 'top', label: 'Accueil' },
   { id: 'about', label: 'À propos' },
+  { id: 'terminal', label: 'Terminal interactif' },
   { id: 'dabapp', label: 'DabApp — projet phare' },
   { id: 'experience', label: 'Expérience' },
   { id: 'skills', label: 'Compétences' },

@@ -1,32 +1,7 @@
-import { useEffect, useState } from 'react'
 import { motion, useMotionValue, useSpring, useScroll, useTransform } from 'framer-motion'
 import { Mail, Phone, MapPin, Linkedin, Github, ArrowDown } from 'lucide-react'
 import { profile } from '../data/content'
-
-const NAME = profile.name
-
-function useTypewriter(text, speed = 70, startDelay = 600) {
-  const [out, setOut] = useState('')
-  useEffect(() => {
-    let i = 0
-    let timeout
-    const start = setTimeout(() => {
-      const tick = () => {
-        i += 1
-        setOut(text.slice(0, i))
-        if (i < text.length) {
-          timeout = setTimeout(tick, speed + Math.random() * 40)
-        }
-      }
-      tick()
-    }, startDelay)
-    return () => {
-      clearTimeout(start)
-      clearTimeout(timeout)
-    }
-  }, [text, speed, startDelay])
-  return out
-}
+import ParticleName from './ParticleName'
 
 const containerVariants = {
   hidden: {},
@@ -43,42 +18,6 @@ const itemVariants = {
     filter: 'blur(0px)',
     transition: { duration: 0.9, ease: [0.16, 1, 0.3, 1] },
   },
-}
-
-// Floating particle field — purely decorative, adds ambient "alive" motion
-function ParticleField() {
-  const particles = Array.from({ length: 22 }, (_, i) => ({
-    id: i,
-    size: 1 + Math.random() * 2.2,
-    left: Math.random() * 100,
-    delay: Math.random() * 8,
-    duration: 14 + Math.random() * 14,
-    drift: (Math.random() - 0.5) * 80,
-  }))
-
-  return (
-    <div className="pointer-events-none absolute inset-0 overflow-hidden">
-      {particles.map((p) => (
-        <motion.span
-          key={p.id}
-          initial={{ y: '110%', x: 0, opacity: 0 }}
-          animate={{
-            y: '-10%',
-            x: [0, p.drift, 0],
-            opacity: [0, 0.7, 0.7, 0],
-          }}
-          transition={{
-            duration: p.duration,
-            delay: p.delay,
-            repeat: Infinity,
-            ease: 'linear',
-          }}
-          style={{ left: `${p.left}%`, width: p.size, height: p.size }}
-          className="absolute rounded-full bg-circuit shadow-glow"
-        />
-      ))}
-    </div>
-  )
 }
 
 function MagneticButton({ children, ...props }) {
@@ -110,48 +49,24 @@ function MagneticButton({ children, ...props }) {
   )
 }
 
-export default function Hero() {
-  const typed = useTypewriter(NAME, 65, 500)
-  const doneTyping = typed.length === NAME.length
+export default function Hero({ ready = true }) {
 
   const { scrollYProgress } = useScroll()
   const heroY = useTransform(scrollYProgress, [0, 0.18], ['0%', '-18%'])
   const heroOpacity = useTransform(scrollYProgress, [0, 0.16], [1, 0])
   const heroScale = useTransform(scrollYProgress, [0, 0.18], [1, 0.94])
 
-  // 3D name — scroll rotation
-  const nameRotateX = useTransform(scrollYProgress, [0, 0.13], [0, 60])
-  const nameRotateY = useTransform(scrollYProgress, [0, 0.13], [0, -15])
-
-  // 3D name — mouse tilt
-  const nameTiltX = useMotionValue(0)
-  const nameTiltY = useMotionValue(0)
-  const smoothTiltX = useSpring(nameTiltX, { stiffness: 100, damping: 18 })
-  const smoothTiltY = useSpring(nameTiltY, { stiffness: 100, damping: 18 })
-
-  const finalRotateX = useTransform([nameRotateX, smoothTiltX], ([s, m]) => s + m)
-  const finalRotateY = useTransform([nameRotateY, smoothTiltY], ([s, m]) => s + m)
-
-  const handleNameTilt = (e) => {
-    const rect = e.currentTarget.getBoundingClientRect()
-    nameTiltY.set(((e.clientX - rect.left - rect.width / 2) / (rect.width / 2)) * 8)
-    nameTiltX.set(-((e.clientY - rect.top - rect.height / 2) / (rect.height / 2)) * 5)
-  }
-  const resetNameTilt = () => { nameTiltX.set(0); nameTiltY.set(0) }
-
   return (
     <section
       id="top"
       className="relative flex min-h-[100svh] flex-col items-center justify-center overflow-hidden px-6 pt-24 text-center md:px-12"
     >
-      <ParticleField />
-
       <motion.div
         style={{ y: heroY, opacity: heroOpacity, scale: heroScale }}
         initial="hidden"
         animate="show"
         variants={containerVariants}
-        className="relative flex max-w-4xl flex-col items-center"
+        className="relative flex w-full max-w-6xl flex-col items-center"
       >
         {/* Eyebrow */}
         <motion.div
@@ -165,30 +80,17 @@ export default function Hero() {
           DISPONIBLE — INGÉNIEUR LOGICIEL
         </motion.div>
 
-        {/* Name with typewriter + 3D scroll effect */}
-        <div
-          style={{ perspective: '1200px' }}
-          onMouseMove={handleNameTilt}
-          onMouseLeave={resetNameTilt}
+        {/* Name — particle signature */}
+        <h1 className="sr-only">{profile.name} — {profile.role}</h1>
+        <motion.div variants={itemVariants} className="w-[min(92vw,1100px)]">
+          <ParticleName text={profile.name.toUpperCase()} ready={ready} />
+        </motion.div>
+        <motion.p
+          variants={itemVariants}
+          className="mt-1 hidden font-mono text-[10px] tracking-[0.3em] text-mute/50 md:block"
         >
-          <motion.h1
-            variants={itemVariants}
-            style={{
-              rotateX: finalRotateX,
-              rotateY: finalRotateY,
-              textShadow:
-                '0 1px 0 #00a8dd, 0 2px 0 #008fb8, 0 3px 0 #007896, 0 4px 0 #006175, 0 5px 0 #004e5e, 0 6px 0 #003c49, 0 8px 16px rgba(0,194,255,0.35), 0 16px 32px rgba(0,0,0,0.55)',
-            }}
-            className="font-display text-5xl font-bold tracking-tight text-offwhite sm:text-6xl md:text-7xl lg:text-8xl"
-          >
-            {typed}
-            <span
-              className={`ml-1 inline-block h-[0.85em] w-[3px] translate-y-1 bg-circuit align-middle ${
-                doneTyping ? 'animate-blink' : 'opacity-100'
-              }`}
-            />
-          </motion.h1>
-        </div>
+          BOUGEZ LA SOURIS — CLIQUEZ POUR EXPLOSER
+        </motion.p>
 
         {/* Subtitle */}
         <motion.p
@@ -250,7 +152,7 @@ export default function Hero() {
         animate={{ opacity: 1 }}
         transition={{ delay: 2.4, duration: 1 }}
         style={{ opacity: heroOpacity }}
-        className="absolute bottom-10 flex flex-col items-center gap-2 text-mute"
+        className="absolute bottom-10 hidden flex-col items-center gap-2 text-mute md:flex"
       >
         <span className="font-mono text-[10px] tracking-[0.3em]">SCROLL</span>
         <motion.div animate={{ y: [0, 8, 0] }} transition={{ repeat: Infinity, duration: 1.8, ease: 'easeInOut' }}>

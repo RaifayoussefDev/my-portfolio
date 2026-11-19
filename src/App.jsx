@@ -14,6 +14,8 @@ import Preloader from './components/Preloader'
 import RevealWipe from './components/RevealWipe'
 import AiChat from './components/AiChat'
 import Stats from './components/Stats'
+import Terminal from './components/Terminal'
+import TechMarquee from './components/TechMarquee'
 import Services from './components/Services'
 import CommandPalette from './components/CommandPalette'
 
@@ -29,11 +31,15 @@ export default function App() {
       <AiChat />
       <CommandPalette />
       <main>
-        <Hero />
+        <Hero ready={booted} />
+        <TechMarquee />
         <RevealWipe>
           <About />
         </RevealWipe>
         <Stats />
+        <RevealWipe>
+          <Terminal />
+        </RevealWipe>
         <RevealWipe>
           <FeaturedProject />
         </RevealWipe>

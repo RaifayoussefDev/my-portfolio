@@ -33,11 +33,17 @@ export default {
       animation: {
         blink: 'blink 1s steps(2, start) infinite',
         scan: 'scan 6s linear infinite',
+        marquee: 'marquee 40s linear infinite',
+        marqueeReverse: 'marquee 40s linear infinite reverse',
       },
       keyframes: {
         blink: {
           '0%, 100%': { opacity: 1 },
           '50%': { opacity: 0 },
+        },
+        marquee: {
+          '0%': { transform: 'translateX(0)' },
+          '100%': { transform: 'translateX(-50%)' },
         },
         scan: {
           '0%': { transform: 'translateY(-100%)' },
