@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react'
 import { motion, useScroll } from 'framer-motion'
+import { Command } from 'lucide-react'
+import { openCommandPalette } from './CommandPalette'
 
 const links = [
   { id: 'about', label: 'À propos' },
   { id: 'dabapp', label: 'DabApp' },
   { id: 'experience', label: 'Expérience' },
   { id: 'skills', label: 'Compétences' },
+  { id: 'services', label: 'Services' },
   { id: 'education', label: 'Formation' },
   { id: 'contact', label: 'Contact' },
 ]
@@ -66,6 +69,13 @@ export default function Navbar() {
                 {link.label}
               </a>
             ))}
+            <button
+              onClick={openCommandPalette}
+              aria-label="Ouvrir la palette de commandes"
+              className="flex items-center gap-1 rounded-md border border-ink-600 px-2 py-1 font-mono text-[10px] text-mute transition-colors hover:border-circuit/50 hover:text-circuit"
+            >
+              <Command size={11} /> K
+            </button>
           </div>
 
           {/* Mobile toggle */}

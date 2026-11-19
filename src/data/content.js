@@ -235,3 +235,44 @@ export const education = [
     period: '2016 — 2017',
   },
 ]
+
+export const stats = [
+  { value: 4, suffix: '+', label: 'Années d\u2019expérience', detail: 'Full Stack en production' },
+  { value: 9, suffix: '', label: 'Projets livrés', detail: 'Web, mobile & services' },
+  { value: 3, suffix: '', label: 'Projets Banque Populaire', detail: 'Conformité, visiteurs, patrimoine' },
+  { value: 30, suffix: '+', label: 'Tables modélisées', detail: 'Architecture DabApp multi-modules' },
+]
+
+export const services = [
+  {
+    icon: 'Layers',
+    title: 'Applications web sur mesure',
+    detail: 'Plateformes métier complètes (RH, conformité, gestion) avec React ou Angular et une API robuste.',
+    deliverables: ['Dashboards & reporting', 'Rôles & permissions', 'Exports Excel / PDF'],
+  },
+  {
+    icon: 'Smartphone',
+    title: 'Applications mobiles Flutter',
+    detail: 'Apps iOS & Android performantes, connectées à votre backend, avec notifications push.',
+    deliverables: ['Firebase push', 'Paiements intégrés', 'Bilingue AR / FR / EN'],
+  },
+  {
+    icon: 'Server',
+    title: 'API & architecture backend',
+    detail: 'API REST sécurisées en Spring Boot, Laravel ou .NET, modélisation de données pensée pour le scale.',
+    deliverables: ['Auth JWT / Sanctum', 'Documentation Swagger', 'Audit trail'],
+  },
+  {
+    icon: 'Cpu',
+    title: 'Intégrations & temps réel',
+    detail: 'Synchronisation multi-sites, contrôle d\u2019accès matériel, passerelles de paiement et services Windows.',
+    deliverables: ['SDK iVMS / tourniquets', 'PayTabs', 'Services C#'],
+  },
+]
+
+export const processSteps = [
+  { step: '01', title: 'Analyse', detail: 'Compréhension du besoin, cadrage fonctionnel et modélisation (UML / Merise).' },
+  { step: '02', title: 'Architecture', detail: 'Choix techniques, schéma de base de données et contrat d\u2019API.' },
+  { step: '03', title: 'Développement', detail: 'Livraisons itératives, code propre et revues régulières avec le client.' },
+  { step: '04', title: 'Production', detail: 'Déploiement, formation des utilisateurs, monitoring et maintenance.' },
+]

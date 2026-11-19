@@ -13,6 +13,9 @@ import Contact from './components/Contact'
 import Preloader from './components/Preloader'
 import RevealWipe from './components/RevealWipe'
 import AiChat from './components/AiChat'
+import Stats from './components/Stats'
+import Services from './components/Services'
+import CommandPalette from './components/CommandPalette'
 
 export default function App() {
   const [booted, setBooted] = useState(false)
@@ -24,11 +27,13 @@ export default function App() {
       {!booted && <Preloader onDone={() => setBooted(true)} />}
       <Navbar />
       <AiChat />
+      <CommandPalette />
       <main>
         <Hero />
         <RevealWipe>
           <About />
         </RevealWipe>
+        <Stats />
         <RevealWipe>
           <FeaturedProject />
         </RevealWipe>
@@ -37,6 +42,9 @@ export default function App() {
         </RevealWipe>
         <RevealWipe>
           <Skills />
+        </RevealWipe>
+        <RevealWipe>
+          <Services />
         </RevealWipe>
         <RevealWipe>
           <GitHubContributions />
