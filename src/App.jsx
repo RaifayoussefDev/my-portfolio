@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Analytics } from '@vercel/analytics/react'
 import CircuitBackground from './components/CircuitBackground'
 import CursorGlow from './components/CursorGlow'
 import Navbar from './components/Navbar'
@@ -30,6 +31,7 @@ export default function App() {
       <Navbar />
       <AiChat />
       <CommandPalette />
+      <Analytics />
       <main>
         <Hero ready={booted} />
         <TechMarquee />

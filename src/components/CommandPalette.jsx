@@ -4,6 +4,7 @@ import {
   Search, Hash, Mail, Copy, Linkedin, Github, Phone, CornerDownLeft, ArrowUp,
 } from 'lucide-react'
 import { profile } from '../data/content'
+import { track } from '../lib/track'
 
 const sections = [
   { id: 'top', label: 'Accueil' },
@@ -88,6 +89,7 @@ export default function CommandPalette() {
 
   useEffect(() => {
     if (open) {
+      track('cmdk_open')
       setQuery('')
       setIndex(0)
       setTimeout(() => inputRef.current?.focus(), 30)
@@ -98,6 +100,7 @@ export default function CommandPalette() {
 
   const execute = (cmd) => {
     if (!cmd) return
+    track('cmdk_run', { cmdk_action: cmd.label })
     setOpen(false)
     setTimeout(() => cmd.run(), 80)
   }

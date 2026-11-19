@@ -1,6 +1,10 @@
 import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { MessageCircle, X, Send, Loader2, Bot } from 'lucide-react'
+import { track } from '../lib/track'
+
+// One id per visit so messages from the same visitor can be grouped
+const SESSION_ID = Math.random().toString(36).slice(2, 8)
 
 const SUGGESTIONS = [
   'Quel est ton stack technique ?',
@@ -24,7 +28,10 @@ export default function AiChat() {
   }, [messages, loading])
 
   useEffect(() => {
-    if (open) setTimeout(() => inputRef.current?.focus(), 300)
+    if (open) {
+      track('chat_open')
+      setTimeout(() => inputRef.current?.focus(), 300)
+    }
   }, [open])
 
   const send = async (text) => {
@@ -33,12 +40,13 @@ export default function AiChat() {
     setInput('')
     setMessages((m) => [...m, { role: 'user', text: msg }])
     setLoading(true)
+    track('chat_message', { chat_session: SESSION_ID })
 
     try {
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: msg }),
+        body: JSON.stringify({ message: msg, sessionId: SESSION_ID, page: window.location.pathname }),
       })
       const data = await res.json()
       setMessages((m) => [...m, { role: 'assistant', text: data.reply || 'Désolé, une erreur est survenue.' }])
@@ -140,6 +148,9 @@ export default function AiChat() {
                   <Send size={15} />
                 </button>
               </div>
+              <p className="mt-2 text-center font-mono text-[10px] text-mute/60">
+                Les conversations sont enregistrées pour améliorer les réponses.
+              </p>
             </div>
           </motion.div>
         )}

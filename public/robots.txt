@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://raifa-youssef-portfolio.vercel.app/sitemap.xml
+Sitemap: https://raifa-youssef.vercel.app/sitemap.xml

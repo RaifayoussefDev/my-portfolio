@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { motion, useInView } from 'framer-motion'
 import SectionLabel from './SectionLabel'
+import { track } from '../lib/track'
 import { profile, skills, experience, featuredProject, education } from '../data/content'
 
 const PROMPT = 'visiteur@raifa:~$'
@@ -116,6 +117,7 @@ export default function Terminal() {
   const sectionRef = useRef(null)
   const inView = useInView(sectionRef, { once: true, margin: '-30%' })
   const demoRan = useRef(false)
+  const demoRunning = useRef(false)
 
   useEffect(() => {
     bodyRef.current?.scrollTo({ top: bodyRef.current.scrollHeight, behavior: 'smooth' })
@@ -132,6 +134,7 @@ export default function Terminal() {
 
     let [name, ...args] = cmdLine.split(/\s+/)
     name = ALIASES[name.toLowerCase()] ?? name.toLowerCase()
+    if (!demoRunning.current) track('terminal_command', { terminal_cmd: cmdLine })
 
     if (name === 'clear') return setLines([])
     if (name === 'history') return push(...history.slice().reverse().map((h, i) => m(`  ${i + 1}  ${h}`)))
@@ -140,6 +143,7 @@ export default function Terminal() {
     if (!fn) return push(err(`${name}: commande introuvable. Tapez 'help'.`))
     const out = fn(args)
     if (out === 'HIRE') {
+      track('terminal_hire_me')
       setBusy(true)
       for (const line of HIRE_SEQUENCE) {
         await new Promise((r) => setTimeout(r, 450))
@@ -157,6 +161,7 @@ export default function Terminal() {
   useEffect(() => {
     if (!inView || demoRan.current) return
     demoRan.current = true
+    demoRunning.current = true
     const demo = 'whoami'
     let i = 0
     setBusy(true)
@@ -168,6 +173,7 @@ export default function Terminal() {
         setTimeout(() => {
           setInput('')
           run(demo)
+          demoRunning.current = false
           setBusy(false)
         }, 350)
       }

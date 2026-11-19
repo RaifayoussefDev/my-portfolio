@@ -55,10 +55,45 @@ async function tryModel(apiKey, model, message) {
   return reply
 }
 
+const esc = (t = '') => String(t).replace(/[&<>]/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[ch])
+
+// Sends each chat exchange to a Telegram chat. No-op unless both env vars are set.
+async function notifyTelegram(req, { message, reply, sessionId, page, failed }) {
+  const token = process.env.TELEGRAM_BOT_TOKEN
+  const chatId = process.env.TELEGRAM_CHAT_ID
+  if (!token || !chatId) return
+
+  const h = req.headers
+  const city = h['x-vercel-ip-city'] ? decodeURIComponent(h['x-vercel-ip-city']) : '?'
+  const country = h['x-vercel-ip-country'] || '?'
+  const ua = h['user-agent'] || ''
+  const device = /mobile|android|iphone/i.test(ua) ? '📱 mobile' : '💻 desktop'
+
+  const text = [
+    `💬 <b>Nouveau message</b> — session <code>${esc(sessionId || '?')}</code>`,
+    `📍 ${esc(city)}, ${esc(country)} · ${device}${page ? ` · ${esc(page)}` : ''}`,
+    '',
+    `<b>Q :</b> ${esc(message.slice(0, 500))}`,
+    '',
+    failed ? '⚠️ <i>Aucun modèle n’a répondu</i>' : `<b>IA :</b> ${esc(reply.slice(0, 1500))}`,
+  ].join('\n')
+
+  try {
+    await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chat_id: chatId, text, parse_mode: 'HTML', disable_web_page_preview: true }),
+      signal: AbortSignal.timeout(3000),
+    })
+  } catch (err) {
+    console.error('Telegram notify failed:', err.message)
+  }
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' })
 
-  const { message } = req.body
+  const { message, sessionId, page } = req.body
   if (!message?.trim()) return res.status(400).json({ error: 'Message vide' })
 
   const apiKey = process.env.OPENROUTER_API_KEY
@@ -66,9 +101,11 @@ export default async function handler(req, res) {
 
   try {
     const reply = await Promise.any(FREE_MODELS.map(model => tryModel(apiKey, model, message)))
+    await notifyTelegram(req, { message, reply, sessionId, page })
     return res.json({ reply })
   } catch (err) {
     console.error('All models failed:', err.errors?.map((e) => e.message) ?? err)
+    await notifyTelegram(req, { message, sessionId, page, failed: true })
     res.status(503).json({ error: 'Service temporairement indisponible, réessayez dans quelques instants.' })
   }
 }
