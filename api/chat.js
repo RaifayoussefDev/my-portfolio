@@ -15,13 +15,14 @@ Informations sur Youssef Raifa :
 
 Ne réponds qu'aux questions en rapport avec Youssef, ses compétences, son expérience ou la prise de contact. Pour tout autre sujet, redirige poliment vers l'essentiel.`
 
+// OpenRouter retire régulièrement des modèles gratuits.
+// `openrouter/free` route automatiquement vers un modèle gratuit disponible ;
+// les autres servent de secours en parallèle.
 const FREE_MODELS = [
-  'meta-llama/llama-3.3-70b-instruct:free',
-  'meta-llama/llama-3.2-3b-instruct:free',
+  'openrouter/free',
+  'baidu/ernie-5.5-flash-preview:free',
+  'nvidia/nemotron-3-ultra-550b-a55b:free',
   'google/gemma-4-31b-it:free',
-  'google/gemma-4-26b-a4b-it:free',
-  'qwen/qwen3-coder:free',
-  'nousresearch/hermes-3-llama-3.1-405b:free',
 ]
 
 async function tryModel(apiKey, model, message) {
@@ -38,15 +39,15 @@ async function tryModel(apiKey, model, message) {
         { role: 'system', content: SYSTEM_PROMPT },
         { role: 'user', content: message.slice(0, 500) },
       ],
-      max_tokens: 400,
+      max_tokens: 800,
       temperature: 0.7,
     }),
   })
 
   const data = await response.json()
-  if (!response.ok) throw new Error(data.error?.message || 'error')
-  const reply = data.choices?.[0]?.message?.content
-  if (!reply) throw new Error('empty')
+  if (!response.ok) throw new Error(`${model}: ${data.error?.message || response.status}`)
+  const reply = data.choices?.[0]?.message?.content?.replace(/<think>[\s\S]*?<\/think>/g, '').trim()
+  if (!reply) throw new Error(`${model}: empty reply`)
   return reply
 }
 
@@ -62,7 +63,8 @@ export default async function handler(req, res) {
   try {
     const reply = await Promise.any(FREE_MODELS.map(model => tryModel(apiKey, model, message)))
     return res.json({ reply })
-  } catch {
+  } catch (err) {
+    console.error('All models failed:', err.errors?.map((e) => e.message) ?? err)
     res.status(503).json({ error: 'Service temporairement indisponible, réessayez dans quelques instants.' })
   }
 }
