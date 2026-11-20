@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion'
 import { Terminal } from 'lucide-react'
 import SectionLabel from './SectionLabel'
+import AsciiPortrait from './AsciiPortrait'
 import { about } from '../data/content'
 
 const fadeUp = {
@@ -11,6 +12,41 @@ const fadeUp = {
     y: 0,
     transition: { duration: 0.7, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] },
   }),
+}
+
+const SNIPPETS = [
+  "const youssef = { mood: '😄', coffee: Infinity }",
+  'while (alive) { code(); learn(); ship() }',
+  'git commit -m "feat: building cool stuff 🚀"',
+  'npm run build-the-future',
+]
+
+// Little live "code editor" line typing over the portrait
+function CodeBubble() {
+  const [i, setI] = useState(0)
+  const [n, setN] = useState(0)
+  const text = SNIPPETS[i]
+
+  useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return setN(text.length)
+    if (n < text.length) {
+      const t = setTimeout(() => setN(n + 1), 45 + Math.random() * 50)
+      return () => clearTimeout(t)
+    }
+    const t = setTimeout(() => {
+      setI((i + 1) % SNIPPETS.length)
+      setN(0)
+    }, 2600)
+    return () => clearTimeout(t)
+  }, [n, i, text])
+
+  return (
+    <div className="pointer-events-none absolute inset-x-3 bottom-9 z-10 rounded-md border border-circuit/25 bg-ink-950/80 px-3 py-2 font-mono text-[10px] text-offwhite backdrop-blur-sm sm:text-[11px]">
+      <span className="text-circuit">❯ </span>
+      {text.slice(0, n)}
+      <span className="ml-0.5 inline-block h-3 w-[6px] translate-y-[2px] animate-blink bg-circuit" />
+    </div>
+  )
 }
 
 function PortraitCard() {
@@ -45,40 +81,29 @@ function PortraitCard() {
         onMouseMove={handleMove}
         onMouseLeave={reset}
         style={{ rotateX, rotateY, transformStyle: 'preserve-3d' }}
-        className="group relative mx-auto aspect-[4/3] w-full max-w-md overflow-hidden rounded-2xl border border-circuit/25 bg-ink-900/60 sm:max-w-sm md:mx-0"
+        className="group relative mx-auto aspect-[4/3] w-full max-w-md overflow-hidden rounded-2xl border border-circuit/25 bg-ink-900/60 md:mx-0"
       >
         <div className="pointer-events-none absolute -top-16 right-0 h-48 w-48 rounded-full bg-circuit/15 blur-[80px]" />
 
         {!imgFailed ? (
-          <img
-            src="/images/raifa-portrait.png"
-            alt="Portrait de Youssef Raifa, Ingénieur Logiciel"
-            onError={() => setImgFailed(true)}
-            style={{ transform: 'translateZ(20px)' }}
-            className="h-full w-full object-cover"
-          />
+          <AsciiPortrait src="/images/raifa-portrait.png" alt="Portrait de Youssef Raifa, Ingénieur Logiciel" />
         ) : (
           <div className="flex h-full w-full flex-col items-center justify-center gap-3 bg-ink-950/60 font-mono text-xs text-circuit/60">
             <Terminal size={28} className="text-circuit/40" />
             <span>/images/raifa-portrait.png</span>
-            <span className="text-mute/60">place ton image ici</span>
           </div>
         )}
 
-        {/* Scanline sweep on hover */}
-        <motion.div
-          initial={{ y: '-100%' }}
-          whileHover={{ y: '100%' }}
-          transition={{ duration: 1.1, ease: 'easeInOut' }}
-          className="pointer-events-none absolute inset-x-0 h-1/3 bg-gradient-to-b from-transparent via-circuit/20 to-transparent"
-        />
+        <CodeBubble />
 
         {/* Bottom gradient + frame label */}
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-ink-950/90 to-transparent" />
         <div className="absolute bottom-3 left-4 font-mono text-[10px] tracking-widest text-circuit/80">
           YR // FULL_STACK
         </div>
-        <div className="absolute right-3 top-3 h-2 w-2 rounded-full bg-circuit shadow-glow" />
+        <div className="pointer-events-none absolute bottom-3 right-4 font-mono text-[10px] tracking-widest text-mute/70">
+          SURVOLEZ ◎
+        </div>
       </motion.div>
     </motion.div>
   )
