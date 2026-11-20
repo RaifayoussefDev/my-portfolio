@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { motion } from 'framer-motion'
+import { useRef, useState } from 'react'
+import { motion, useScroll, useTransform } from 'framer-motion'
 import { Bike, Smartphone, LayoutDashboard, Server, CreditCard, Database, ImageOff } from 'lucide-react'
 import SectionLabel from './SectionLabel'
 import { featuredProject } from '../data/content'
@@ -22,15 +22,25 @@ const fadeUp = {
 
 function DabAppBanner() {
   const [failed, setFailed] = useState(false)
+  const ref = useRef(null)
+  // Apple-style "stand up": the mockup lies tilted back and rises flat as it scrolls in
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'center center'] })
+  const rotateX = useTransform(scrollYProgress, [0, 1], [32, 0])
+  const scale = useTransform(scrollYProgress, [0, 1], [0.86, 1])
+  const y = useTransform(scrollYProgress, [0, 1], [60, 0])
+  const glow = useTransform(scrollYProgress, [0.5, 1], [0, 1])
 
   return (
+    <div ref={ref} className="mx-7 mt-7 md:mx-12 md:mt-12" style={{ perspective: 1400 }}>
     <motion.div
-      initial={{ opacity: 0, scale: 1.03 }}
-      whileInView={{ opacity: 1, scale: 1 }}
-      viewport={{ once: true, margin: '-60px' }}
-      transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-      className="relative mx-7 mt-7 overflow-hidden rounded-xl border border-circuit/20 md:mx-12 md:mt-12"
+      style={{ rotateX, scale, y, transformOrigin: 'center bottom' }}
+      className="relative overflow-hidden rounded-xl border border-circuit/20"
     >
+      <motion.div
+        aria-hidden
+        style={{ opacity: glow }}
+        className="pointer-events-none absolute inset-0 z-10 rounded-xl shadow-[inset_0_0_0_1px_rgba(0,194,255,0.5),0_0_60px_rgba(0,194,255,0.25)]"
+      />
       {!failed ? (
         <img
           src="/images/dabapp-mockup.png"
@@ -47,6 +57,7 @@ function DabAppBanner() {
       )}
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink-900 via-transparent to-transparent" />
     </motion.div>
+    </div>
   )
 }
 

@@ -18,7 +18,18 @@
 html, body {
   background-color: #000000;
   color: #eef1f6;
-  overflow-x: hidden;
+  /* clip (not hidden) so position: sticky keeps working */
+  overflow-x: clip;
+}
+
+/* Lenis smooth scroll */
+html.lenis, html.lenis body { height: auto; }
+html.lenis, html.lenis * { scroll-behavior: auto !important; }
+.lenis.lenis-stopped { overflow: hidden; }
+
+.text-outline {
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(238, 241, 246, 0.55);
 }
 
 body {

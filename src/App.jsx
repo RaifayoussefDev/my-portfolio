@@ -45,9 +45,8 @@ export default function App() {
         <RevealWipe>
           <FeaturedProject />
         </RevealWipe>
-        <RevealWipe>
-          <Experience />
-        </RevealWipe>
+        {/* Not wrapped in RevealWipe: its overflow clipping would break the sticky horizontal scroll */}
+        <Experience />
         <RevealWipe>
           <Skills />
         </RevealWipe>

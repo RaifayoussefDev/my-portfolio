@@ -24,7 +24,7 @@ export default function AiChat() {
   const inputRef = useRef(null)
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
   }, [messages, loading])
 
   useEffect(() => {
@@ -88,7 +88,7 @@ export default function AiChat() {
             </div>
 
             {/* Messages */}
-            <div className="flex-1 space-y-3 overflow-y-auto p-4">
+            <div data-lenis-prevent className="flex-1 space-y-3 overflow-y-auto p-4">
               {messages.map((m, i) => (
                 <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                   <div

@@ -5,6 +5,7 @@ import {
 } from 'lucide-react'
 import { profile } from '../data/content'
 import { track } from '../lib/track'
+import { scrollToId } from '../lib/smoothScroll'
 
 const sections = [
   { id: 'top', label: 'Accueil' },
@@ -38,10 +39,7 @@ export default function CommandPalette() {
         group: 'Navigation',
         label: s.label,
         icon: s.id === 'top' ? ArrowUp : Hash,
-        run: () => {
-          if (s.id === 'top') window.scrollTo({ top: 0, behavior: 'smooth' })
-          else document.getElementById(s.id)?.scrollIntoView({ behavior: 'smooth' })
-        },
+        run: () => scrollToId(s.id),
       })),
       {
         group: 'Actions',
@@ -156,7 +154,7 @@ export default function CommandPalette() {
                 <kbd className="rounded border border-ink-600 px-1.5 py-0.5 font-mono text-[10px] text-mute">ESC</kbd>
               </div>
 
-              <ul className="max-h-[50vh] overflow-y-auto py-2">
+              <ul data-lenis-prevent className="max-h-[50vh] overflow-y-auto py-2">
                 {filtered.length === 0 && (
                   <li className="px-4 py-6 text-center font-mono text-xs text-mute">
                     command not found: {query}

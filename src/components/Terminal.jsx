@@ -242,6 +242,7 @@ export default function Terminal() {
 
         <div
           ref={bodyRef}
+          data-lenis-prevent
           className="h-[380px] overflow-y-auto px-4 py-4 font-mono text-[12px] leading-relaxed sm:text-[13px]"
           role="log"
           aria-live="polite"

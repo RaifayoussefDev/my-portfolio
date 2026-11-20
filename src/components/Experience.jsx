@@ -1,43 +1,87 @@
-import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronDown, Building2 } from 'lucide-react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { motion, useScroll, useTransform } from 'framer-motion'
+import { Building2, ArrowRight } from 'lucide-react'
 import SectionLabel from './SectionLabel'
 import { experience, internship } from '../data/content'
 
-const cardVariants = {
-  hidden: { opacity: 0, y: 40 },
-  show: (i = 0) => ({
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.6, delay: (i % 3) * 0.08, ease: [0.16, 1, 0.3, 1] },
-  }),
+function useHorizontalMode() {
+  const query = '(min-width: 900px) and (min-height: 640px) and (prefers-reduced-motion: no-preference)'
+  const [on, setOn] = useState(() => typeof window !== 'undefined' && window.matchMedia(query).matches)
+  useEffect(() => {
+    const mq = window.matchMedia(query)
+    const onChange = () => setOn(mq.matches)
+    mq.addEventListener('change', onChange)
+    return () => mq.removeEventListener('change', onChange)
+  }, [])
+  return on
 }
 
-function ProjectCard({ project, index }) {
-  const [open, setOpen] = useState(false)
-
+function IntroPanel() {
+  const clientCount = experience.projects.filter((p) => p.client).length
   return (
-    <motion.div
-      custom={index}
-      initial="hidden"
-      whileInView="show"
-      viewport={{ once: true, margin: '-60px' }}
-      variants={cardVariants}
-      whileHover={{ y: -4, borderColor: 'rgba(0,194,255,0.45)' }}
-      className="group flex flex-col rounded-xl border border-ink-600 bg-ink-900/50 p-5 transition-colors"
-    >
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <h3 className="font-display text-base font-semibold text-offwhite">{project.name}</h3>
-          {project.client && (
-            <p className="mt-0.5 font-mono text-[10px] tracking-wide text-circuitDim">{project.client}</p>
-          )}
+    <div className="flex w-full shrink-0 flex-col justify-between rounded-2xl border border-circuit/25 bg-gradient-to-br from-circuit/[0.08] to-transparent p-8 md:w-[440px]">
+      <div>
+        <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-circuit/10 text-circuit">
+          <Building2 size={20} />
         </div>
+        <p className="mt-6 font-mono text-xs tracking-widest text-circuit">{experience.period.toUpperCase()}</p>
+        <h3 className="mt-2 font-display text-4xl font-bold leading-tight text-offwhite md:text-5xl">
+          {experience.company}
+        </h3>
+        <p className="mt-2 text-mute">
+          {experience.role} — {experience.location}
+        </p>
+      </div>
+      <div className="mt-8 space-y-4">
+        <div className="flex gap-8">
+          <div>
+            <div className="font-display text-3xl font-bold text-offwhite">{experience.projects.length}</div>
+            <div className="font-mono text-[11px] text-mute">projets livrés</div>
+          </div>
+          <div>
+            <div className="font-display text-3xl font-bold text-offwhite">{clientCount}</div>
+            <div className="font-mono text-[11px] text-mute">pour Banque Populaire</div>
+          </div>
+        </div>
+        <p className="border-t border-ink-700 pt-4 font-mono text-[11px] text-mute">
+          + {internship.role} · {internship.period}
+        </p>
+        <p className="hidden items-center gap-2 font-mono text-[11px] text-circuit md:flex">
+          Continuez à scroller <ArrowRight size={13} />
+        </p>
+      </div>
+    </div>
+  )
+}
+
+function ProjectPanel({ project, index }) {
+  return (
+    <article className="group relative flex w-full shrink-0 flex-col overflow-hidden rounded-2xl border border-ink-600 bg-ink-900/70 p-7 transition-colors duration-500 hover:border-circuit/50 md:w-[400px]">
+      <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-circuit/0 blur-[70px] transition-colors duration-500 group-hover:bg-circuit/20" />
+      <span className="text-outline pointer-events-none absolute -right-2 -top-5 select-none font-display text-[96px] opacity-70 font-bold leading-none transition-all duration-500 group-hover:[-webkit-text-stroke-color:rgba(0,194,255,0.6)]">
+        {String(index + 1).padStart(2, '0')}
+      </span>
+
+      <div className="relative">
+        {project.client ? (
+          <p className="font-mono text-[10px] tracking-widest text-circuit">CLIENT · {project.client.toUpperCase()}</p>
+        ) : (
+          <p className="font-mono text-[10px] tracking-widest text-mute">CAPITALSOFT</p>
+        )}
+        <h3 className="mt-2 max-w-[66%] font-display text-2xl font-semibold leading-tight text-offwhite">{project.name}</h3>
+        <p className="mt-3 text-sm leading-relaxed text-mute">{project.summary}</p>
       </div>
 
-      <p className="mt-3 text-sm leading-relaxed text-mute">{project.summary}</p>
+      <ul className="relative mt-5 flex-1 space-y-2">
+        {project.points.slice(0, 3).map((pt, i) => (
+          <li key={i} className="flex gap-2 text-xs leading-relaxed text-mute/90">
+            <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-circuit/70" />
+            {pt}
+          </li>
+        ))}
+      </ul>
 
-      <div className="mt-4 flex flex-wrap gap-1.5">
+      <div className="relative mt-5 flex flex-wrap gap-1.5">
         {project.stack.map((s) => (
           <span
             key={s}
@@ -47,91 +91,100 @@ function ProjectCard({ project, index }) {
           </span>
         ))}
       </div>
+    </article>
+  )
+}
 
-      <button
-        onClick={() => setOpen((v) => !v)}
-        className="mt-4 flex items-center gap-1.5 self-start font-mono text-[11px] text-circuit/80 transition-colors hover:text-circuit"
-      >
-        {open ? 'Réduire' : 'Détails'}
-        <motion.span animate={{ rotate: open ? 180 : 0 }} transition={{ duration: 0.3 }}>
-          <ChevronDown size={13} />
-        </motion.span>
-      </button>
+function HorizontalExperience() {
+  const sectionRef = useRef(null)
+  const trackRef = useRef(null)
+  const [distance, setDistance] = useState(0)
+  const [vh, setVh] = useState(() => window.innerHeight)
 
-      <AnimatePresence initial={false}>
-        {open && (
-          <motion.ul
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-            className="mt-3 space-y-2 overflow-hidden border-t border-ink-700 pt-3"
+  useLayoutEffect(() => {
+    const measure = () => {
+      const track = trackRef.current
+      if (!track) return
+      setDistance(Math.max(0, track.scrollWidth - window.innerWidth))
+      setVh(window.innerHeight)
+    }
+    measure()
+    const ro = new ResizeObserver(measure)
+    ro.observe(trackRef.current)
+    window.addEventListener('resize', measure)
+    return () => {
+      ro.disconnect()
+      window.removeEventListener('resize', measure)
+    }
+  }, [])
+
+  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ['start start', 'end end'] })
+  const x = useTransform(scrollYProgress, [0, 1], [0, -distance])
+  const progress = useTransform(scrollYProgress, [0, 1], ['0%', '100%'])
+  const [current, setCurrent] = useState(1)
+  useEffect(
+    () =>
+      scrollYProgress.on('change', (v) => {
+        setCurrent(Math.min(experience.projects.length, Math.max(1, Math.round(v * experience.projects.length + 0.5))))
+      }),
+    [scrollYProgress]
+  )
+
+  return (
+    <section id="experience" ref={sectionRef} className="relative" style={{ height: distance + vh }}>
+      <div className="sticky top-0 flex h-screen flex-col justify-center overflow-hidden">
+        <div className="mx-auto w-full max-w-6xl px-12">
+          <SectionLabel command="cat experience.log | less" title="Expérience professionnelle" />
+        </div>
+
+        <motion.div ref={trackRef} style={{ x }} className="flex h-[min(56vh,470px)] gap-6 pl-[max(3rem,calc((100vw_-_72rem)/2_+_3rem))]">
+          <IntroPanel />
+          {experience.projects.map((p, i) => (
+            <ProjectPanel key={p.id} project={p} index={i} />
+          ))}
+          {/* end spacer so the last card stops short of the edge */}
+          <div aria-hidden className="w-[max(3rem,calc((100vw_-_72rem)/2_+_3rem))] shrink-0" />
+        </motion.div>
+
+        <div className="mx-auto mt-8 flex w-full max-w-6xl items-center gap-5 px-12">
+          <span className="font-mono text-xs text-circuit font-feature-tnum">
+            {String(current).padStart(2, '0')} / {String(experience.projects.length).padStart(2, '0')}
+          </span>
+          <div className="h-px flex-1 bg-ink-600">
+            <motion.div style={{ width: progress }} className="h-px bg-circuit shadow-glow" />
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function StackedExperience() {
+  return (
+    <section id="experience" className="relative mx-auto max-w-6xl px-6 py-28 md:px-12">
+      <SectionLabel command="cat experience.log" title="Expérience professionnelle" />
+      <div className="grid gap-5 md:grid-cols-2">
+        <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="flex">
+          <IntroPanel />
+        </motion.div>
+        {experience.projects.map((p, i) => (
+          <motion.div
+            key={p.id}
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-40px' }}
+            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+            className="flex"
           >
-            {project.points.map((pt, i) => (
-              <li key={i} className="flex gap-2 text-xs leading-relaxed text-mute">
-                <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-circuit/70" />
-                {pt}
-              </li>
-            ))}
-          </motion.ul>
-        )}
-      </AnimatePresence>
-    </motion.div>
+            <ProjectPanel project={p} index={i} />
+          </motion.div>
+        ))}
+      </div>
+    </section>
   )
 }
 
 export default function Experience() {
-  return (
-    <section id="experience" className="relative mx-auto max-w-6xl px-6 py-28 md:px-12">
-      <SectionLabel command="cat experience.log" title="Expérience professionnelle" />
-
-      {/* Role header */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.6 }}
-        className="mb-10 flex flex-col items-start justify-between gap-3 rounded-xl border border-circuit/20 bg-circuit/[0.04] p-5 sm:flex-row sm:items-center"
-      >
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-circuit/10 text-circuit">
-            <Building2 size={18} />
-          </div>
-          <div>
-            <h3 className="font-display text-lg font-semibold text-offwhite">
-              {experience.role} <span className="text-circuit">@ {experience.company}</span>
-            </h3>
-            <p className="font-mono text-xs text-mute">{experience.location}</p>
-          </div>
-        </div>
-        <span className="rounded-full border border-circuit/30 px-3 py-1 font-mono text-xs text-circuit">
-          {experience.period}
-        </span>
-      </motion.div>
-
-      {/* Project grid */}
-      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {experience.projects.map((project, i) => (
-          <ProjectCard key={project.id} project={project} index={i} />
-        ))}
-      </div>
-
-      {/* Internship, quieter footnote */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.6 }}
-        className="mt-8 flex flex-col items-start justify-between gap-2 border-t border-ink-700 pt-6 sm:flex-row sm:items-center"
-      >
-        <div>
-          <h4 className="font-display text-sm font-medium text-offwhite">
-            {internship.role} <span className="text-mute">@ {internship.company}</span>
-          </h4>
-          <p className="mt-1 text-xs text-mute">{internship.points.join(' · ')}</p>
-        </div>
-        <span className="font-mono text-[11px] text-mute">{internship.period}</span>
-      </motion.div>
-    </section>
-  )
+  const horizontal = useHorizontalMode()
+  return horizontal ? <HorizontalExperience /> : <StackedExperience />
 }

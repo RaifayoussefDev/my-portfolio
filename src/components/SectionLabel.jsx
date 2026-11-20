@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import ScrambleText from './ScrambleText'
 
 /**
  * SectionLabel — the page's structural signature.
@@ -21,7 +22,7 @@ export default function SectionLabel({ command, title }) {
         <span className="inline-block h-3 w-[7px] translate-y-[1px] animate-blink bg-circuit/80" />
       </div>
       <h2 className="mt-3 font-display text-3xl font-semibold tracking-tight text-offwhite md:text-4xl">
-        {title}
+        <ScrambleText text={title} />
       </h2>
       <div className="mt-5 h-px w-full bg-gradient-to-r from-circuit/40 via-ink-600 to-transparent" />
     </motion.div>
